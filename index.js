@@ -1,38 +1,41 @@
 import * as THREE from 'three';
 import * as dat from 'three/examples/jsm/libs/dat.gui.module.js';
+import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
+import {FOGPARAMS} from  './src/const.js'
 import FogPlane from './src/fog/fogPlane.js'
 
 require('normalize.css/normalize.css');
 require('./src/css/index.css');
 
+//
+
 let camera, scene, renderer;
-let container, controls;
+let container, controls, stats;
 let planeMesh;
 
 let clock = new THREE.Clock();
 
-let params = {
-    fogNearColor: 0xfc4848,
-    fogHorizonColor: 0xe4dcff,
-    fogDensity: 0.0025,
-    fogNoiseSpeed: 100,
-    fogNoiseFreq: .0012,
-    fogNoiseImpact: .5
-};
+//
 
 window.onload = function() {
-    init();
+    
+    initScene();
     initFog();
+
     initObjects();
+
     initControls();
+    initStats();
     initGUI();
 
     animate();
 }
 
-function init() {
+//
+
+function initScene() {
     container = document.getElementById('canvas');
 
     camera = new THREE.PerspectiveCamera(
@@ -58,8 +61,8 @@ function init() {
 
 function initFog() {
 
-    scene.background = new THREE.Color(params.fogHorizonColor);
-    scene.fog = new THREE.FogExp2(params.fogHorizonColor, params.fogDensity);
+    scene.background = new THREE.Color(FOGPARAMS.fogHorizonColor);
+    scene.fog = new THREE.FogExp2(FOGPARAMS.fogHorizonColor, FOGPARAMS.fogDensity);
 
 }
 
@@ -88,34 +91,46 @@ function initGUI() {
 
     var gui = new dat.GUI();
 
-    gui.add(params, "fogDensity", 0, 0.01).onChange(function () {
-        scene.fog.density = params.fogDensity;
+    gui.add(FOGPARAMS, "fogDensity", 0, 0.01).onChange(function () {
+        scene.fog.density = FOGPARAMS.fogDensity;
     });
 
-    gui.addColor(params, "fogHorizonColor").onChange(function () {
-        scene.fog.color.set(params.fogHorizonColor);
-        scene.background = new THREE.Color(params.fogHorizonColor);
+    gui.addColor(FOGPARAMS, "fogHorizonColor").onChange(function () {
+        scene.fog.color.set(FOGPARAMS.fogHorizonColor);
+        scene.background = new THREE.Color(FOGPARAMS.fogHorizonColor);
     });
 
-    gui.addColor(params, "fogNearColor").onChange(function () {
+    gui.addColor(FOGPARAMS, "fogNearColor").onChange(function () {
         planeMesh.terrainShader.uniforms.fogNearColor = {
-            value: new THREE.Color(params.fogNearColor)
+            value: new THREE.Color(FOGPARAMS.fogNearColor)
         };
     });
 
-    gui.add(params, "fogNoiseFreq", 0, 0.01, 0.0012).onChange(function () {
-        planeMesh.terrainShader.uniforms.fogNoiseFreq.value = params.fogNoiseFreq;
+    gui.add(FOGPARAMS, "fogNoiseFreq", 0, 0.01, 0.0012).onChange(function () {
+        planeMesh.terrainShader.uniforms.fogNoiseFreq.value = FOGPARAMS.fogNoiseFreq;
     });
 
-    gui.add(params, "fogNoiseSpeed", 0, 1000, 100).onChange(function () {
-        planeMesh.terrainShader.uniforms.fogNoiseSpeed.value = params.fogNoiseSpeed;
+    gui.add(FOGPARAMS, "fogNoiseSpeed", 0, 1000, 100).onChange(function () {
+        planeMesh.terrainShader.uniforms.fogNoiseSpeed.value = FOGPARAMS.fogNoiseSpeed;
     });
 
-    gui.add(params, "fogNoiseImpact", 0, 1).onChange(function () {
-        planeMesh.terrainShader.uniforms.fogNoiseImpact.value = params.fogNoiseImpact;
+    gui.add(FOGPARAMS, "fogNoiseImpact", 0, 1).onChange(function () {
+        planeMesh.terrainShader.uniforms.fogNoiseImpact.value = FOGPARAMS.fogNoiseImpact;
     });
 
     gui.open();
+}
+
+//
+
+function initStats() {
+
+    var axesHelper = new THREE.AxesHelper( 5 );
+    scene.add( axesHelper );
+
+    stats = new Stats();
+    document.body.appendChild(stats.dom);
+
 }
 
 //
@@ -125,6 +140,7 @@ function animate() {
     let deltaTime = clock.getDelta();
 
     controls.update(deltaTime);
+    stats.update();
 
     planeMesh.update(deltaTime);
 

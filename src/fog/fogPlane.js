@@ -1,22 +1,8 @@
 import * as THREE from 'three';
 import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise';
+
 import { fogParsVert, fogVert, fogParsFrag, fogFrag } from './shader/fogShader.js';
-
-//
-
-const worldWidth = 256,
-    worldDepth = 256;
-
-//
-
-var params = {
-    fogNearColor: 0xfc4848,
-    fogHorizonColor: 0xe4dcff,
-    fogDensity: 0.0025,
-    fogNoiseSpeed: 100,
-    fogNoiseFreq: .0012,
-    fogNoiseImpact: .5
-};
+import {FOGPARAMS, WORLDWIDTH, WORLDDEPTH} from  '../../src/const.js'
 
 //
 
@@ -41,8 +27,8 @@ export default class FogPlane extends THREE.Mesh {
         let geometry = new THREE.PlaneBufferGeometry(
             7500,
             7500,
-            worldWidth - 1,
-            worldDepth - 1
+            WORLDWIDTH - 1,
+            WORLDDEPTH - 1
         );
 
         geometry.rotateX(-Math.PI / 2);
@@ -50,7 +36,7 @@ export default class FogPlane extends THREE.Mesh {
         if (noise == true) {
             var vertices = geometry.attributes.position.array;
 
-            var data = this.generateHeight(worldWidth, worldDepth);
+            var data = this.generateHeight(WORLDWIDTH, WORLDDEPTH);
 
             for (var i = 0, j = 0, l = vertices.length; i < l; i++, j += 3) {
                 vertices[j + 1] = data[i] * 10;
@@ -87,10 +73,10 @@ export default class FogPlane extends THREE.Mesh {
             );
     
             const uniforms = ({
-                fogNearColor: { value: new THREE.Color(params.fogNearColor) },
-                fogNoiseFreq: { value: params.fogNoiseFreq },
-                fogNoiseSpeed: { value: params.fogNoiseSpeed },
-                fogNoiseImpact: { value: params.fogNoiseImpact },
+                fogNearColor: { value: new THREE.Color( FOGPARAMS.fogNearColor ) },
+                fogNoiseFreq: { value: FOGPARAMS.fogNoiseFreq },
+                fogNoiseSpeed: { value: FOGPARAMS.fogNoiseSpeed },
+                fogNoiseImpact: { value: FOGPARAMS.fogNoiseImpact },
                 time: { value: 0 }
             });
     
