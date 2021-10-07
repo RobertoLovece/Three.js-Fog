@@ -7,5 +7,5 @@ export const FOGPARAMS = {
     fogNoiseImpact: .5
 };
 
-export const WORLDWIDTH = 256;
-export const WORLDDEPTH = 256;
+export const RESOLUTIONX = 256;
+export const RESOLUTIONZ = 256;

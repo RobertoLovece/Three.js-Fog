@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise';
 
 import { fogParsVert, fogVert, fogParsFrag, fogFrag } from './shader/fogShader.js';
-import {FOGPARAMS, WORLDWIDTH, WORLDDEPTH} from  '../../src/const.js'
+import {FOGPARAMS, RESOLUTIONX, RESOLUTIONZ} from  '../../src/const.js'
 
 //
 
@@ -27,8 +27,8 @@ export default class FogPlane extends THREE.Mesh {
         let geometry = new THREE.PlaneBufferGeometry(
             7500,
             7500,
-            WORLDWIDTH - 1,
-            WORLDDEPTH - 1
+            RESOLUTIONX,
+            RESOLUTIONZ 
         );
 
         geometry.rotateX(-Math.PI / 2);
@@ -36,7 +36,7 @@ export default class FogPlane extends THREE.Mesh {
         if (noise == true) {
             var vertices = geometry.attributes.position.array;
 
-            var data = this.generateHeight(WORLDWIDTH, WORLDDEPTH);
+            var data = this.generateHeight(RESOLUTIONX, RESOLUTIONZ);
 
             for (var i = 0, j = 0, l = vertices.length; i < l; i++, j += 3) {
                 vertices[j + 1] = data[i] * 10;
@@ -56,19 +56,19 @@ export default class FogPlane extends THREE.Mesh {
 
         material.onBeforeCompile = shader => {
             shader.vertexShader = shader.vertexShader.replace(
-                `#include <fog_pars_vertex>`,
+                '#include <fog_pars_vertex>',
                 fogParsVert
             );
             shader.vertexShader = shader.vertexShader.replace(
-                `#include <fog_vertex>`,
+                '#include <fog_vertex>',
                 fogVert
             );
             shader.fragmentShader = shader.fragmentShader.replace(
-                `#include <fog_pars_fragment>`,
+                '#include <fog_pars_fragment>',
                 fogParsFrag
             );
             shader.fragmentShader = shader.fragmentShader.replace(
-                `#include <fog_fragment>`,
+                '#include <fog_fragment>',
                 fogFrag
             );
     
